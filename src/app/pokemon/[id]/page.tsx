@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { use } from "react"; // Import `use` from React
+import { use } from "react";
+import StatsChart from "@/app/components/StatsChart";
 
 const POKEMON_API = "https://pokeapi.co/api/v2/";
 
@@ -13,22 +14,21 @@ interface Pokemon {
   height: string;
   weight: string;
   base_experience: string;
-  types: string[];
-  abilities: string[];
+  types: any[];
+  abilities: any[];
   moves: any[];
-  stats: { name: string; value: number }[];
+  stats: any[];
 }
 
 export default function PokemonDetail() {
   const params = useParams();
-  //   const params = use(paramsPromise); // Unwrap params correctly
 
   const [pokemonDetails, setPokemonDetails] = useState<Pokemon | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function fetchPokemon() {
-      if (!params.id) return; // Ensure ID exists before fetching
+      if (!params.id) return;
 
       const response = await fetch(`${POKEMON_API}pokemon/${params.id}`);
       const data = await response.json();
@@ -44,16 +44,31 @@ export default function PokemonDetail() {
 
   return (
     <>
-      <div className="flex flex-col items-center p-6">
-        <h1 className="text-3xl font-bold capitalize">{pokemonDetails.name}</h1>
-        <img
-          src={pokemonDetails.sprites.other["official-artwork"].front_default}
-          alt={pokemonDetails.name}
-          className="w-48 h-48"
-        />
-        <p>Height: {pokemonDetails.height}m</p>
-        <p>Weight: {pokemonDetails.weight}kg</p>
-        <p>Xp: {pokemonDetails.base_experience}</p>
+      <div className="flex justify-center gap-1 items-center p-6 ">
+        <div className="flex flex-col gap-1 mt-6">
+          <img
+            src={pokemonDetails.sprites.other["official-artwork"].front_default}
+            alt={pokemonDetails.name}
+            className="w-48 h-48"
+          />
+          <h1 className="text-3xl font-bold capitalize">
+            {pokemonDetails.name}
+          </h1>
+          <p>Height: {pokemonDetails.height}m</p>
+          <p>Weight: {pokemonDetails.weight}kg</p>
+          <p>Xp: {pokemonDetails.base_experience}</p>
+        </div>
+        {/* Stats Section */}
+        <div className="">
+          <div className="oultine   oultine-red-500 oultine-2">
+            <StatsChart
+              stats={pokemonDetails.stats.map((s) => ({
+                name: s.stat.name.toUpperCase(),
+                value: s.base_stat,
+              }))}
+            />
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-wrap justify-center gap-4 mt-6">
@@ -94,22 +109,6 @@ export default function PokemonDetail() {
         )}
       </div>
 
-      {/* Stats Section */}
-      <div className="mt-6">
-        <h2 className="text-2xl font-semibold mb-3">Stats</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-          {pokemonDetails.stats.map((stat, index) => (
-            <div
-              key={index}
-              className="bg-gray-100 p-3 rounded-lg text-center shadow-sm"
-            >
-              <p className="font-semibold">{stat.name}</p>
-              <p>{stat.value}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-
       {/* Moves Section */}
       <div className="mt-6">
         <h2 className="text-2xl font-semibold mb-3">Moves</h2>
@@ -119,7 +118,34 @@ export default function PokemonDetail() {
               key={index}
               className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
             >
-              {moveObj.move.name} {/* Extract move name properly */}
+              {moveObj.move.name}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      {/* Abilities Section */}
+      <div className="mt-6">
+        <h2 className="text-2xl font-semibold mb-3">Abilities</h2>
+        <ul className="list-disc pl-5">
+          {pokemonDetails.abilities.map((a, index) => (
+            <li key={index} className="capitalize text-lg">
+              {a.ability.name}
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Types Section */}
+      <div className="mt-6">
+        <h2 className="text-2xl font-semibold mb-3">Types</h2>
+        <div className="flex gap-2">
+          {pokemonDetails.types.map((t, index) => (
+            <span
+              key={index}
+              className="bg-gray-200 text-black px-3 py-1 rounded-full text-lg capitalize"
+            >
+              {t.type.name}
             </span>
           ))}
         </div>
