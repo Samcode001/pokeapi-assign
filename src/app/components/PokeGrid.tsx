@@ -1,58 +1,33 @@
 "use client";
-import { useEffect, useState } from "react";
-import Image from "next/image";
-import { useRecoilState, useSetRecoilState } from "recoil";
-import { pokemonListState } from "../store/atoms";
 
-interface Pokemon {
-  name: string;
-  image: string;
-}
+import { useEffect } from "react";
+import Image from "next/image";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPokemon } from "../store/slices/pokemonSlice";
+import { RootState, AppDispatch } from "../store/store";
+import { useRouter } from "next/navigation";
 
 export default function PokeGrid() {
-  const [pokemonList, setPokemonList] = useRecoilState(pokemonListState);
-  const [loading, setLoading] = useState(true);
-
-  async function fetchPokemon() {
-    try {
-      const response = await fetch(
-        "https://pokeapi.co/api/v2/pokemon?limit=12"
-      );
-      const data = await response.json();
-
-      // Fetch details for each Pokémon
-      const detailedPokemon = await Promise.all(
-        data.results.map(async (poke: any) => {
-          const res = await fetch(poke.url);
-          const details = await res.json();
-          return {
-            name: details.name,
-            image: details.sprites.other["official-artwork"].front_default, // Using default Pokémon sprite
-          };
-        })
-      );
-      console.log(data);
-
-      setPokemonList(detailedPokemon);
-      setLoading(false);
-    } catch (error) {
-      console.error("Error fetching Pokémon:", error);
-      setLoading(false);
-    }
-  }
+  const dispatch = useDispatch<AppDispatch>();
+  const { list, filteredList, searchTerm, loading } = useSelector(
+    (state: RootState) => state.pokemon
+  );
+  console.log(filteredList);
+  const router = useRouter();
 
   useEffect(() => {
-    fetchPokemon();
-  }, []);
+    if (list.length === 0) dispatch(fetchPokemon());
+  }, [dispatch, list]);
 
   return loading ? (
     <p className="text-gray-600 text-center">Loading Pokémon...</p>
   ) : (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6">
-      {pokemonList.map((poke: any, index: any) => (
+      {(searchTerm.length == 0 ? list : filteredList).map((poke, index) => (
         <div
           key={index}
           className="bg-white rounded-2xl p-4 shadow-lg transition-all hover:scale-105 hover:shadow-xl flex flex-col items-center"
+          onClick={() => router.push(`/pokemon/${poke.id}`)}
         >
           <Image
             src={poke.image}
@@ -66,6 +41,9 @@ export default function PokeGrid() {
           </h3>
         </div>
       ))}
+      {searchTerm.length > 0 && filteredList.length === 0 && (
+        <p className="text-gray-600 text-center">No Pokemon found</p>
+      )}
     </div>
   );
 }
