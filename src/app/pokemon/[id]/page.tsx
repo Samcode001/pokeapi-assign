@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import { use } from "react";
 import StatsChart from "@/app/components/StatsChart";
 
 const POKEMON_API = "https://pokeapi.co/api/v2/";
@@ -44,7 +43,7 @@ export default function PokemonDetail() {
 
   return (
     <>
-      <div className="flex justify-center gap-1 items-center p-6 ">
+      <div className="flex flex-wrap justify-center gap-1 items-center p-6 ">
         <div className="flex flex-col gap-1 mt-6">
           <img
             src={pokemonDetails.sprites.other["official-artwork"].front_default}
@@ -60,7 +59,7 @@ export default function PokemonDetail() {
         </div>
         {/* Stats Section */}
         <div className="">
-          <div className="oultine   oultine-red-500 oultine-2">
+          <div className="">
             <StatsChart
               stats={pokemonDetails.stats.map((s) => ({
                 name: s.stat.name.toUpperCase(),
@@ -109,7 +108,7 @@ export default function PokemonDetail() {
         )}
       </div>
 
-      {/* Moves Section */}
+      {/* -----------------------------  Moves Section ------------------------------ */}
       <div className="mt-6">
         <h2 className="text-2xl font-semibold mb-3">Moves</h2>
         <div className="flex flex-wrap gap-2">
@@ -124,7 +123,7 @@ export default function PokemonDetail() {
         </div>
       </div>
 
-      {/* Abilities Section */}
+      {/*-------------------------------  Abilities Section ------------------------------ */}
       <div className="mt-6">
         <h2 className="text-2xl font-semibold mb-3">Abilities</h2>
         <ul className="list-disc pl-5">
@@ -136,7 +135,7 @@ export default function PokemonDetail() {
         </ul>
       </div>
 
-      {/* Types Section */}
+      {/* -----------------------------  Types Section ------------------------------ */}
       <div className="mt-6">
         <h2 className="text-2xl font-semibold mb-3">Types</h2>
         <div className="flex gap-2">

@@ -20,7 +20,7 @@ const StatsChart: React.FC<StatsChartProps> = ({ stats }) => {
       <div className="absolute text-center">
         <p className="text-lg font-semibold">Stats</p>
       </div>
-      <div className="flex gap-2 items-center">
+      <div className="flex flex-wrap gap-2 items-center">
         <PieChart width={300} height={300}>
           <Pie
             data={stats}
